@@ -1,21 +1,20 @@
 import React from 'react';
-import Modal from './Modal';
 
 const MovieList = ({ movies, onMovieClick }) => {
     return (
         <div className="movie-list">
             {movies.map((movie) => (
                 <div
-                    key={movie.imdbID}
+                    key={movie.id}
                     className="movie-card"
-                    onClick={() => onMovieClick(movie)} // Trigger modal with movie data
+                    onClick={() => onMovieClick(movie)} // Call the correct function
                 >
                     <img
-                        src={movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/500'}
-                        alt={movie.Title}
                         className="movie-poster"
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                        alt={movie.title}
                     />
-                    <h3>{movie.Title}</h3>
+                    <div className="movie-title">{movie.title}</div>
                 </div>
             ))}
         </div>

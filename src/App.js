@@ -5,24 +5,32 @@ import MovieList from './components/MovieList';
 import SearchBar from './components/SearchBar'; // Importing SearchBar component
 import './App.css';
 
-// Fetch movies from the OMDB API
+const options = {
+    method: 'GET',
+    headers: {
+        accept: 'application/json',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwNWY2ZDNkYmMyMGExM2ExZmUwYzA1M2YzNjhmNzg4NSIsIm5iZiI6MTczMjg2NDU4NC42MzUsInN1YiI6IjY3NDk2YTQ4NmEzZjVkMDVhN2RjNzVmNyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.82AIYePPJm1X7ALDWmomBNd4IXh6eP7wycJdcbwXCHU', // Replace with your actual TMDB API key
+    },
+};
+
+// Fetch movies from the TMDB API
 const getMovieRequest = async (page, setMovies, setLoading, query) => {
     setLoading(true); // Show loading while fetching
-    let url = `http://www.omdbapi.com/?s=movie&page=${page}&apikey=263d22d8`;
+    let url = `https://api.themoviedb.org/3/movie/popular?language=en-US&page=${page}`;
 
     // If there's a query, use it to search for movies
     if (query) {
-        url = `http://www.omdbapi.com/?s=${query}&type=movie&page=${page}&apikey=263d22d8`;
+        url = `https://api.themoviedb.org/3/search/movie?query=${query}&language=en-US&page=${page}`;
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, options); // Include options here
         const data = await response.json();
-        
-        if (data.Response === "True") {
-            setMovies((prevMovies) => [...prevMovies, ...data.Search]); // Add new movies to existing ones
+
+        if (data.results) {
+            setMovies((prevMovies) => [...prevMovies, ...data.results]); // Add new movies to existing ones
         } else {
-            console.error("Error fetching movies:", data.Error);
+            console.error("Error fetching movies:", data.status_message);
             setMovies([]); // Clear movies if no results found
         }
     } catch (error) {
@@ -63,15 +71,15 @@ const App = () => {
     return (
         <div className="app">
             <Header />
-            
+
             {/* Add SearchBar component */}
             <SearchBar setMovies={setMovies} setLoading={setLoading} setPage={setPage} setQuery={setQuery} />
 
             <MovieList movies={movies} onMovieClick={onMovieClick} /> {/* Movie List Display */}
-            
+
             {/* Show Modal if a movie is selected */}
             {selectedMovie && <Modal movie={selectedMovie} closeModal={closeModal} />}
-            
+
             <div className="load-more-container">
                 {loading ? (
                     <p>Loading...</p>
